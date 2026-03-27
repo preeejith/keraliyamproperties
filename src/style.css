@@ -1,0 +1,17 @@
+/* Global reset & base styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #faf8f3;
+  color: #1a2310;
+  -webkit-font-smoothing: antialiased;
+}
