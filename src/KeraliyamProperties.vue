@@ -3,7 +3,7 @@
     <!-- ====== NAVBAR ====== -->
     <nav class="navbar" :class="{ scrolled: isScrolled }">
       <div class="nav-container">
-        <div class="logo">
+        <div class="logo" @click="scrollTo('home')">
           <span class="logo-leaf">🌿</span>
           <div class="logo-text">
             <span class="logo-main">Keraliyam</span>
@@ -204,11 +204,7 @@
       <div class="footer-inner">
         <div class="footer-brand">
           <div class="logo">
-            <span class="logo-leaf">🌿</span>
-            <div class="logo-text">
-              <span class="logo-main">Keraliyam</span>
-              <span class="logo-sub">Properties</span>
-            </div>
+            <img src="/logo.png" alt="Keraliyam Properties" class="logo-img logo-img--footer" />
           </div>
           <p>Your trusted real estate partner in God's Own Country. Verified listings, expert guidance, and heartfelt service.</p>
           <div class="social-icons">
@@ -415,6 +411,66 @@ export default {
           image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=80',
           description: 'Spacious independent house with a private garden. Ideal for large families. The house has an attached garage, generator backup, and CCTV security.'
         },
+        {
+          id: 10, type: 'buy',
+          title: 'Premium Kerala Backwater Villa',
+          location: 'Kumarakom, Kottayam',
+          price: '₹2.5 Crore',
+          area: '4500 sqft',
+          beds: 5, baths: 5,
+          image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=600&q=80',
+          description: 'Luxurious resort-style backwater villa in Kumarakom with direct lake access. Features a private pool, jetty, and authentic Kerala-style woodwork.'
+        },
+        {
+          id: 11, type: 'buy',
+          title: 'Cozy 2BHK Suburban House',
+          location: 'Edappally, Kochi',
+          price: '₹48 Lakhs',
+          area: '1200 sqft',
+          beds: 2, baths: 2,
+          image: 'https://images.unsplash.com/photo-1599427303058-f04cbfa476a3?w=600&q=80',
+          description: 'A beautiful and budget-friendly 2BHK standalone house in Edappally. Peaceful residential area with easy access to LuLu Mall and Metro Station.'
+        },
+        {
+          id: 12, type: 'buy',
+          title: 'Hill View Farmhouse',
+          location: 'Munnar, Idukki',
+          price: '₹1.1 Crore',
+          area: '2800 sqft',
+          beds: 3, baths: 3,
+          image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=600&q=80',
+          description: 'A charming tea-estate farmhouse nestled in the misty hills of Munnar. Enjoy fresh breezes, chilly winters, and panoramic mountain views.'
+        },
+        {
+          id: 13, type: 'rent',
+          title: '3BHK Luxury Seaview Apartment',
+          location: 'Marine Drive, Kochi',
+          price: '₹45,000/mo',
+          area: '2200 sqft',
+          beds: 3, baths: 3,
+          image: 'https://images.unsplash.com/photo-1502672260266-1c1f52d36259?w=600&q=80',
+          description: 'Premium high-rise apartment on Marine Drive offering stunning Arabian Sea views. Fully furnished with modular kitchen, gym, and infinity pool access.'
+        },
+        {
+          id: 14, type: 'rent',
+          title: 'Traditional Independent House',
+          location: 'Vazhuthacaud, Trivandrum',
+          price: '₹22,000/mo',
+          area: '1900 sqft',
+          beds: 3, baths: 2,
+          image: 'https://images.unsplash.com/photo-1628172909403-176aa34b1edc?w=600&q=80',
+          description: 'A highly spacious and well-maintained traditional-style house located in the premium residential hub of Vazhuthacaud. Pet friendly with ample parking.'
+        },
+        {
+          id: 15, type: 'rent',
+          title: 'Cozy 1BHK Near Technopark',
+          location: 'Kazhakkoottam, Trivandrum',
+          price: '₹9,000/mo',
+          area: '700 sqft',
+          beds: 1, baths: 1,
+          image: 'https://images.unsplash.com/photo-1588880331179-bc9b93a8cb65?w=600&q=80',
+          description: 'Neat and cozy unfurnished 1BHK ground floor portion just minutes away from Technopark. Ideal for bachelors or small families.'
+        }
       ],
     };
   },
@@ -530,9 +586,10 @@ export default {
 .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
 .logo-main {
   font-family: var(--font-display); font-size: 22px; font-weight: 700;
-  color: var(--white); letter-spacing: 0.01em;
+  color: #ffffff !important; letter-spacing: 0.01em;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
 }
-.navbar.scrolled .logo-main { color: var(--dark); }
+.navbar.scrolled .logo-main { color: var(--dark) !important; text-shadow: none; }
 .logo-sub {
   font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
   text-transform: uppercase; color: rgba(255,255,255,0.7);
@@ -568,7 +625,7 @@ export default {
 /* ===== HERO ===== */
 .hero {
   min-height: 100vh;
-  background: url('https://images.unsplash.com/photo-1626803775151-61d756612f97?w=1600&q=80') center/cover no-repeat;
+  background: url('/kerala_hero.png') center/cover no-repeat;
   position: relative; display: flex; flex-direction: column;
   justify-content: center; align-items: center; text-align: center;
   padding: 120px 24px 80px;
@@ -587,8 +644,9 @@ export default {
 }
 .hero-heading {
   font-family: var(--font-display); font-size: clamp(38px, 6vw, 72px);
-  font-weight: 700; color: var(--white); line-height: 1.1;
+  font-weight: 700; color: #ffffff !important; line-height: 1.1;
   margin-bottom: 18px; letter-spacing: -0.01em;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
 }
 .hero-heading span { color: #a8d5a2; }
 .hero-sub { font-size: 17px; color: rgba(255,255,255,0.8); max-width: 540px; margin: 0 auto 36px; line-height: 1.7; }
@@ -611,7 +669,7 @@ export default {
   width: 100%; padding: 16px 0; cursor: pointer;
 }
 .search-btn {
-  background: var(--green); color: white; border: none;
+  background: var(--green); color: black; border: none;
   padding: 16px 28px; font-size: 14px; font-weight: 600;
   font-family: var(--font-body); cursor: pointer; letter-spacing: 0.03em;
   transition: var(--trans); white-space: nowrap;
@@ -694,10 +752,15 @@ export default {
 .filter-tabs button {
   padding: 9px 20px; border-radius: 50px; border: 1.5px solid var(--border);
   background: white; color: var(--mid); font-family: var(--font-body);
-  font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--trans);
+  font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.filter-tabs button:hover, .filter-tabs button.active {
-  background: var(--green); color: white; border-color: var(--green);
+.filter-tabs button:hover {
+  border-color: black; color: black;
+}
+.filter-tabs button.active {
+  background: black; color: white; border-color: black;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
 }
 
 .listings-grid {
@@ -866,51 +929,52 @@ export default {
   border-color: var(--green); background: white;
 }
 .form-btn {
-  width: 100%; background: var(--green); color: white; border: none;
+  width: 100%; background: white; color: black; border: 2px solid black;
   padding: 14px; border-radius: 10px; font-family: var(--font-body);
-  font-size: 15px; font-weight: 600; cursor: pointer; transition: var(--trans);
-  letter-spacing: 0.03em;
+  font-size: 15px; font-weight: 800; cursor: pointer; transition: var(--trans);
+  letter-spacing: 0.05em; text-transform: uppercase;
 }
-.form-btn:hover { background: var(--green-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(58,125,68,0.25); }
+.form-btn:hover { background: black; color: white; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
 .form-success { text-align: center; color: var(--green); font-weight: 600; margin-top: 14px; font-size: 14px; }
 
 /* ===== FOOTER ===== */
-.footer { background: var(--dark); padding: 64px 32px 0; }
+.footer { background: white; border-top: 1px solid var(--border); padding: 72px 32px 0; }
 .footer-inner {
   max-width: 1200px; margin: 0 auto;
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
   padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-.footer-brand .logo-main { color: white; }
-.footer-brand .logo-sub { color: rgba(255,255,255,0.4); }
+.footer-brand .logo-img--footer { height: 38px; filter: none; margin-bottom: 8px; }
 .footer-brand > p {
-  color: rgba(255,255,255,0.45); font-size: 14px; line-height: 1.7;
+  color: var(--mid); font-size: 14px; line-height: 1.7;
   margin: 16px 0 24px;
 }
 .social-icons { display: flex; gap: 10px; }
 .social-icons a {
   width: 36px; height: 36px; border-radius: 8px;
-  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+  background: var(--cream); border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center; transition: var(--trans);
 }
 .social-icons a:hover { background: var(--green); border-color: var(--green); }
 .social-icons svg {
-  width: 16px; height: 16px; fill: none; stroke: rgba(255,255,255,0.7);
+  width: 16px; height: 16px; fill: none; stroke: var(--mid);
   stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  transition: var(--trans);
 }
 .social-icons a:hover svg { stroke: white; }
 .footer-links h4 {
   font-size: 13px; font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 18px;
+  text-transform: uppercase; color: var(--dark); margin-bottom: 20px;
 }
-.footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
 .footer-links a {
-  font-size: 14px; color: rgba(255,255,255,0.4); text-decoration: none; transition: var(--trans);
+  font-size: 14px; color: var(--mid); text-decoration: none; transition: var(--trans);
 }
-.footer-links a:hover { color: #a8d5a2; padding-left: 4px; }
+.footer-links a:hover { color: var(--green); padding-left: 4px; }
 .footer-bottom {
-  max-width: 1200px; margin: 0 auto; padding: 20px 0;
-  text-align: center; color: rgba(255,255,255,0.25); font-size: 13px;
+  max-width: 1200px; margin: 0 auto; padding: 24px 0;
+  text-align: center; color: var(--light); font-size: 13px;
+  border-top: 1px solid var(--border);
 }
 
 /* ===== MODAL ===== */
