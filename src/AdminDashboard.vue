@@ -49,13 +49,17 @@
       <section v-if="tab === 'properties'">
         <div class="header-row">
           <h2>Manage Properties</h2>
-          <button @click="openAddModal" class="add-btn">+ Add Property</button>
+          <div class="actions-group">
+            <input type="text" v-model="searchQuery" placeholder="Search by ID or Title..." class="search-input" />
+            <button @click="openAddModal" class="add-btn">+ Add Property</button>
+          </div>
         </div>
         
         <div class="property-grid">
-          <div v-for="p in properties" :key="p.id" class="prop-card">
+          <div v-for="p in filteredProperties" :key="p.id" class="prop-card">
             <img :src="p.image" class="prop-img" alt="Property Image" />
             <div class="prop-details">
+              <span class="prop-id-badge">ID: {{ p.id }}</span>
               <h4>{{ p.title }}</h4>
               <p>{{ p.price }} • {{ p.type }}</p>
               <div class="card-actions">
@@ -154,6 +158,7 @@ import imageCompression from 'browser-image-compression'
 export default {
   data() {
     return {
+      searchQuery: '',
       tab: 'enquiries',
       enquiries: [],
       properties: [],
@@ -163,6 +168,16 @@ export default {
       uploadTask: '',
       imageFile: null,
       form: { id: null, title: '', type: 'buy', price: '', location: '', beds: '', baths: '', area: '', description: '', featured: false, image: '' }
+    }
+  },
+  computed: {
+    filteredProperties() {
+      if (!this.searchQuery) return this.properties;
+      const lowerQ = this.searchQuery.toLowerCase();
+      return this.properties.filter(p => 
+        String(p.id).includes(lowerQ) ||
+        (p.title && p.title.toLowerCase().includes(lowerQ))
+      );
     }
   },
   async mounted() {
@@ -277,6 +292,9 @@ export default {
 .admin-content { padding: 40px; max-width: 1200px; margin: 0 auto; }
 .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .header-row h2 { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: #1a2310; margin: 0; }
+.actions-group { display: flex; gap: 12px; align-items: center; }
+.search-input { padding: 10px 16px; border-radius: 6px; border: 1px solid #ddd; width: 250px; font-family: inherit; }
+.search-input:focus { outline: none; border-color: #3a7d44; }
 .refresh-btn, .add-btn { background: #3a7d44; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.3s; }
 .add-btn:hover { background: #2a5a31; }
 
@@ -292,6 +310,7 @@ th { background: #f0f4ec; color: #2a5a31; font-weight: 600; }
 .prop-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
 .prop-img { width: 100%; height: 180px; object-fit: cover; }
 .prop-details { padding: 20px; }
+.prop-id-badge { display: inline-block; background: #e0e8dc; color: #2a5a31; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
 .prop-details h4 { margin: 0 0 8px 0; font-size: 18px; color: #1a2310; }
 .prop-details p { margin: 0; color: #666; font-size: 14px; margin-bottom: 16px; }
 .card-actions { display: flex; gap: 10px; }
