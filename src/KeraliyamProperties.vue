@@ -408,7 +408,7 @@ export default {
         };
         // 1. Sends the email via EmailJS parameters
         await emailjs.send(
-          'service_k9gew2g', 
+          'service_vyivztb', 
           'template_9mqfwyn', 
           templateParams, 
           'xK6okF69CoaBGnoAi'
@@ -434,7 +434,7 @@ export default {
         setTimeout(() => this.formSuccess = false, 5000);
       } catch (error) {
         console.error('FAILED...', error);
-        alert('Failed to send enquiry via EmailJS. Please make sure you have added your actual Service ID, Template ID, and Public Key in the code.');
+        alert(`EmailJS Error: ${error?.text || error?.message || 'Check EmailJS Dashboard Settings'}`);
       }
     },
     handleScroll() {
