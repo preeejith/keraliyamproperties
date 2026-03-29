@@ -1,12 +1,9 @@
 <template>
-  <KeraliyamProperties />
+  <router-view />
 </template>
 
 <script>
-import KeraliyamProperties from './KeraliyamProperties.vue'
-
 export default {
-  name: 'App',
-  components: { KeraliyamProperties }
+  name: 'App'
 }
 </script>
