@@ -177,6 +177,10 @@
             <input type="text" v-model="form.name" placeholder="Rajan Menon" required />
           </div>
           <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" v-model="form.email" placeholder="rajan@example.com" />
+          </div>
+          <div class="form-group">
             <label>Phone Number</label>
             <input type="tel" v-model="form.phone" placeholder="+91 98765 43210" required />
           </div>
@@ -274,7 +278,7 @@
               <div><strong>Price</strong><span class="modal-price">{{ selectedProperty.price }}</span></div>
             </div>
             <p class="modal-desc">{{ selectedProperty.description }}</p>
-            <button class="form-btn" @click="selectedProperty = null; scrollTo('contact')">Enquire About This Property</button>
+            <button class="form-btn" @click="prepEnquiry(selectedProperty)">Enquire About This Property</button>
           </div>
         </div>
       </div>
@@ -283,6 +287,9 @@
 </template>
 
 <script>
+import { supabase } from './supabase'
+import emailjs from '@emailjs/browser'
+
 export default {
   name: 'KeraliyamProperties',
   data() {
@@ -294,7 +301,8 @@ export default {
       searchType: '',
       selectedProperty: null,
       formSuccess: false,
-      form: { name: '', phone: '', interest: '', message: '' },
+      loadingProperties: true,
+      form: { name: '', email: '', phone: '', interest: '', message: '' },
 
       stats: [
         { value: '850+', label: 'Properties Listed' },
@@ -323,155 +331,7 @@ export default {
         { icon: '📞', title: '24/7 Support', desc: 'Our dedicated support team is always available to answer your queries.' },
       ],
 
-      properties: [
-        {
-          id: 1, type: 'land', featured: true,
-          title: 'Scenic 20 Cents Plot – Wayanad Hillside',
-          location: 'Kalpetta, Wayanad',
-          price: '₹32 Lakhs',
-          area: '20 Cents',
-          image: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80',
-          description: 'A beautiful hillside plot with breathtaking views of Wayanad\'s lush green valleys. Ideal for a holiday home or eco-resort. Road access available, water connection nearby.'
-        },
-        {
-          id: 2, type: 'buy', featured: true,
-          title: '3BHK Modern Villa – Kochi Suburbs',
-          location: 'Kakkanad, Kochi',
-          price: '₹85 Lakhs',
-          area: '1800 sqft',
-          beds: 3, baths: 2,
-          image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=80',
-          description: 'A contemporary 3BHK villa in the heart of Kochi\'s IT corridor. Features modular kitchen, covered parking, and a private garden. Close to schools and shopping malls.'
-        },
-        {
-          id: 3, type: 'rent', featured: true,
-          title: '2BHK Furnished Apartment – Calicut',
-          location: 'Mavoor Road, Kozhikode',
-          price: '₹12,000/mo',
-          area: '1100 sqft',
-          beds: 2, baths: 2,
-          image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&q=80',
-          description: 'Fully furnished 2BHK apartment with all modern amenities. AC rooms, high-speed internet, 24hr security, and generator backup. Ideal for working professionals.'
-        },
-        {
-          id: 4, type: 'land',
-          title: 'Riverside 50 Cents – Alappuzha',
-          location: 'Chengannur, Alappuzha',
-          price: '₹48 Lakhs',
-          area: '50 Cents',
-          image: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=600&q=80',
-          description: 'A serene 50 cent riverfront plot along the Pamba riverbank. Perfect for luxury resort development or a premium private villa. DTCP approved layout.'
-        },
-        {
-          id: 5, type: 'buy',
-          title: 'Traditional Nalukettu Home – Thrissur',
-          location: 'Guruvayur, Thrissur',
-          price: '₹1.2 Crore',
-          area: '3200 sqft',
-          beds: 4, baths: 3,
-          image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80',
-          description: 'An authentically restored traditional Nalukettu with a central courtyard. Teak wood flooring, antique pillars, and a lush garden. A rare heritage property.'
-        },
-        {
-          id: 6, type: 'rent',
-          title: '1BHK Studio – Thiruvananthapuram',
-          location: 'Technopark, Trivandrum',
-          price: '₹7,500/mo',
-          area: '650 sqft',
-          beds: 1, baths: 1,
-          image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80',
-          description: 'Compact and comfortable studio apartment just 500m from Technopark Phase 1. Ideal for IT professionals. Includes Wi-Fi, gym, and rooftop café access.'
-        },
-        {
-          id: 7, type: 'land', featured: true,
-          title: 'Commercial Plot – NH 66 Frontage',
-          location: 'Kannur Bypass, Kannur',
-          price: '₹1.8 Crore',
-          area: '1.2 Acres',
-          image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80',
-          description: 'Prime commercial land with direct highway frontage on NH-66. Ideal for hotel, petrol bunk, or retail complex. All clearances in place.'
-        },
-        {
-          id: 8, type: 'buy',
-          title: '4BHK Luxury Villa – Palakkad',
-          location: 'Olavakkode, Palakkad',
-          price: '₹65 Lakhs',
-          area: '2400 sqft',
-          beds: 4, baths: 3,
-          image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&q=80',
-          description: 'Spacious 4BHK villa with premium interiors, Italian marble flooring, solar panels, and a private swimming pool. A symbol of luxury living in Palakkad.'
-        },
-        {
-          id: 9, type: 'rent',
-          title: '3BHK Independent House – Thrissur',
-          location: 'Ollur, Thrissur',
-          price: '₹18,000/mo',
-          area: '1800 sqft',
-          beds: 3, baths: 2,
-          image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=80',
-          description: 'Spacious independent house with a private garden. Ideal for large families. The house has an attached garage, generator backup, and CCTV security.'
-        },
-        {
-          id: 10, type: 'buy',
-          title: 'Premium Kerala Backwater Villa',
-          location: 'Kumarakom, Kottayam',
-          price: '₹2.5 Crore',
-          area: '4500 sqft',
-          beds: 5, baths: 5,
-          image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=600&q=80',
-          description: 'Luxurious resort-style backwater villa in Kumarakom with direct lake access. Features a private pool, jetty, and authentic Kerala-style woodwork.'
-        },
-        {
-          id: 11, type: 'buy',
-          title: 'Cozy 2BHK Suburban House',
-          location: 'Edappally, Kochi',
-          price: '₹48 Lakhs',
-          area: '1200 sqft',
-          beds: 2, baths: 2,
-          image: 'https://images.unsplash.com/photo-1599427303058-f04cbfa476a3?w=600&q=80',
-          description: 'A beautiful and budget-friendly 2BHK standalone house in Edappally. Peaceful residential area with easy access to LuLu Mall and Metro Station.'
-        },
-        {
-          id: 12, type: 'buy',
-          title: 'Hill View Farmhouse',
-          location: 'Munnar, Idukki',
-          price: '₹1.1 Crore',
-          area: '2800 sqft',
-          beds: 3, baths: 3,
-          image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=600&q=80',
-          description: 'A charming tea-estate farmhouse nestled in the misty hills of Munnar. Enjoy fresh breezes, chilly winters, and panoramic mountain views.'
-        },
-        {
-          id: 13, type: 'rent',
-          title: '3BHK Luxury Seaview Apartment',
-          location: 'Marine Drive, Kochi',
-          price: '₹45,000/mo',
-          area: '2200 sqft',
-          beds: 3, baths: 3,
-          image: 'https://images.unsplash.com/photo-1502672260266-1c1f52d36259?w=600&q=80',
-          description: 'Premium high-rise apartment on Marine Drive offering stunning Arabian Sea views. Fully furnished with modular kitchen, gym, and infinity pool access.'
-        },
-        {
-          id: 14, type: 'rent',
-          title: 'Traditional Independent House',
-          location: 'Vazhuthacaud, Trivandrum',
-          price: '₹22,000/mo',
-          area: '1900 sqft',
-          beds: 3, baths: 2,
-          image: 'https://images.unsplash.com/photo-1628172909403-176aa34b1edc?w=600&q=80',
-          description: 'A highly spacious and well-maintained traditional-style house located in the premium residential hub of Vazhuthacaud. Pet friendly with ample parking.'
-        },
-        {
-          id: 15, type: 'rent',
-          title: 'Cozy 1BHK Near Technopark',
-          location: 'Kazhakkoottam, Trivandrum',
-          price: '₹9,000/mo',
-          area: '700 sqft',
-          beds: 1, baths: 1,
-          image: 'https://images.unsplash.com/photo-1588880331179-bc9b93a8cb65?w=600&q=80',
-          description: 'Neat and cozy unfurnished 1BHK ground floor portion just minutes away from Technopark. Ideal for bachelors or small families.'
-        }
-      ],
+      properties: [],
     };
   },
 
@@ -490,6 +350,22 @@ export default {
   },
 
   methods: {
+    async fetchProperties() {
+      try {
+        this.loadingProperties = true;
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*');
+        if (error) throw error;
+        if (data && data.length > 0) {
+          this.properties = data;
+        }
+      } catch (err) {
+        console.error('Error fetching properties from Supabase:', err.message);
+      } finally {
+        this.loadingProperties = false;
+      }
+    },
     setFilter(type) {
       this.activeFilter = type;
       this.scrollTo('listings');
@@ -513,18 +389,62 @@ export default {
     openModal(p) {
       this.selectedProperty = p;
     },
-    submitForm() {
-      this.formSuccess = true;
-      this.form = { name: '', phone: '', interest: '', message: '' };
-      setTimeout(() => this.formSuccess = false, 5000);
+    prepEnquiry(property) {
+      if (property) {
+        this.form.interest = this.badgeLabel(property.type);
+        this.form.message = `Hi, I am interested in the property: "${property.title}" (ID: ${property.id}). Please send me more details.`;
+      }
+      this.selectedProperty = null;
+      this.scrollTo('contact');
+    },
+    async submitForm() {
+      try {
+        const templateParams = {
+          name: this.form.name,
+          email: this.form.email,
+          phone: this.form.phone,
+          interest: this.form.interest,
+          message: this.form.message,
+        };
+        // 1. Sends the email via EmailJS parameters
+        await emailjs.send(
+          'service_k9gew2g', 
+          'template_9mqfwyn', 
+          templateParams, 
+          'xK6okF69CoaBGnoAi'
+        );
+
+        // 2. Saves directly into your Supabase Database
+        const { error: dbError } = await supabase
+          .from('enquiries')
+          .insert([{
+            name: this.form.name,
+            email: this.form.email,
+            phone: this.form.phone,
+            interest: this.form.interest,
+            message: this.form.message
+          }]);
+          
+        if (dbError) {
+          console.error('Supabase save error:', dbError.message);
+        }
+        
+        this.formSuccess = true;
+        this.form = { name: '', email: '', phone: '', interest: '', message: '' };
+        setTimeout(() => this.formSuccess = false, 5000);
+      } catch (error) {
+        console.error('FAILED...', error);
+        alert('Failed to send enquiry via EmailJS. Please make sure you have added your actual Service ID, Template ID, and Public Key in the code.');
+      }
     },
     handleScroll() {
       this.isScrolled = window.scrollY > 60;
     },
   },
 
-  mounted() {
+  async mounted() {
     window.addEventListener('scroll', this.handleScroll);
+    await this.fetchProperties();
   },
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
