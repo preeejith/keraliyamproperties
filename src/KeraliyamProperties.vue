@@ -125,7 +125,7 @@
     <!-- ====== FEATURED ====== -->
     <section class="featured">
       <div class="featured-bg"></div>
-      <div class="section-header light">
+      <div class="section-header">
         <p class="section-eyebrow">Hand-Picked</p>
         <h2>Featured Properties</h2>
         <p class="section-desc">Premium listings selected for their location, value, and quality.</p>
@@ -166,49 +166,78 @@
     <section id="contact" class="contact">
       <div class="contact-inner">
         <div class="contact-info">
-          <p class="section-eyebrow">Get In Touch</p>
-          <h2>Talk to Our Property Experts</h2>
-          <p>Whether you're buying, selling, or renting — our team is here to guide you every step of the way.</p>
+          <p class="section-eyebrow contact-eyebrow">Get In Touch</p>
+          <h2 class="contact-heading">Talk to Our Property Experts</h2>
+          <p class="contact-desc">Whether you're buying, selling, or renting — our team is here to guide you every step of the way.</p>
           <div class="contact-details">
-            <div class="contact-item"><span>📞</span> +91 96339 22011</div>
-            <div class="contact-item"><span>📧</span> keraliyamproperties@gmail.com</div>
-            <div class="contact-item"><span>📍</span> Kochi, Kerala, India</div>
+            <div class="contact-item">
+              <div class="contact-icon">📞</div>
+              <div class="contact-text">
+                <span class="contact-label">Call Us</span>
+                <strong>+91 96339 22011</strong>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">📧</div>
+              <div class="contact-text">
+                <span class="contact-label">Email Us</span>
+                <strong>keraliyamproperties@gmail.com</strong>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">📍</div>
+              <div class="contact-text">
+                <span class="contact-label">Visit Us</span>
+                <strong>Kochi, Kerala, India</strong>
+              </div>
+            </div>
           </div>
         </div>
-        <form class="contact-form" @submit.prevent="submitForm">
-          <div class="form-group">
-            <label>Your Name</label>
-            <input type="text" v-model="form.name" placeholder="Rajan Menon" required />
-          </div>
-          <div class="form-group">
-            <label>Email Address</label>
-            <input type="email" v-model="form.email" placeholder="rajan@example.com" />
-          </div>
-          <div class="form-group">
-            <label>Phone Number</label>
-            <input type="tel" v-model="form.phone" placeholder="+91 98765 43210" required />
-          </div>
-          <div class="form-group">
-            <label>Interested In</label>
-            <select v-model="form.interest">
-              <option value="">Select property type</option>
-              <option>Land for Sale</option>
-              <option>House for Sale</option>
-              <option>House for Rent</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Message</label>
-            <textarea v-model="form.message" placeholder="Tell us what you're looking for..." rows="4"></textarea>
-          </div>
-          <button type="submit" class="form-btn">Send Enquiry</button>
-          <p v-if="formSuccess" class="form-success">✅ Thank you! We'll contact you shortly.</p>
-        </form>
+        <div class="contact-form-wrapper">
+          <form class="contact-form" @submit.prevent="submitForm">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" v-model="form.name" placeholder="Rajan Menon" required />
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" v-model="form.email" placeholder="rajan@example.com" />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" v-model="form.phone" placeholder="+91..." required />
+            </div>
+            <div class="form-group">
+              <label>Interested In</label>
+              <select v-model="form.interest">
+                <option value="">Select property type</option>
+                <option>Land for Sale</option>
+                <option>House for Sale</option>
+                <option>House for Rent</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea v-model="form.message" placeholder="Tell us what you're looking for..." rows="4"></textarea>
+            </div>
+            <button type="submit" class="form-btn">Send Enquiry</button>
+            <p v-if="formSuccess" class="form-success">✅ Thank you! We'll contact you shortly.</p>
+          </form>
+        </div>
       </div>
     </section>
 
     <!-- ====== FOOTER ====== -->
     <footer class="footer">
+      <div class="footer-cta-container">
+        <div class="footer-cta">
+          <div class="cta-content">
+            <h2>Ready to Find Your Dream Property?</h2>
+            <p>Join over 1200+ happy families who found their perfect home in Kerala with us.</p>
+          </div>
+          <button class="cta-btn" @click="scrollTo('contact')">Get in Touch Now</button>
+        </div>
+      </div>
       <div class="footer-inner">
         <div class="footer-brand">
           <div class="logo">
@@ -261,7 +290,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>© 2025 Keraliyam Properties. All rights reserved. Made with ♥ in Kerala.</p>
+        <p>© 2026 Keraliyam Properties. All rights reserved. Made with ♥ in Kerala.</p>
       </div>
     </footer>
 
@@ -757,60 +786,54 @@ export default {
 .no-results { text-align: center; padding: 60px; color: var(--light); font-size: 16px; }
 
 /* ===== FEATURED ===== */
-.featured {
-  position: relative; padding: 90px 32px; overflow: hidden;
-}
+.featured { position: relative; padding: 100px 32px; overflow: hidden; border-top: 1px solid rgba(0,0,0,0.06); border-bottom: 1px solid rgba(0,0,0,0.06); }
 .featured-bg {
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, #1a2310 0%, #2d4a1e 50%, #1e3a2a 100%);
+  background: linear-gradient(135deg, #f5f0e6 0%, #e8e3d5 100%);
 }
-.featured { position: relative; }
-.featured .section-header { position: relative; }
+.featured .section-header { position: relative; z-index: 2; }
 .featured-grid {
-  position: relative; max-width: 1200px; margin: 0 auto;
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+  position: relative; max-width: 1200px; margin: 0 auto; z-index: 2;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px;
 }
 .featured-card {
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  background: white; border: 1px solid rgba(0,0,0,0.05);
   border-radius: var(--radius); overflow: hidden; display: flex;
-  backdrop-filter: blur(8px); transition: var(--trans);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.04); transition: var(--trans);
 }
-.featured-card:first-child {
-  grid-column: 1 / -1; flex-direction: row;
-}
-.featured-card:hover {
-  background: rgba(255,255,255,0.1); transform: translateY(-4px);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-}
+.featured-card:first-child { grid-column: 1 / -1; flex-direction: row; }
+.featured-card:hover { transform: translateY(-6px); box-shadow: 0 25px 50px rgba(0,0,0,0.08); border-color: var(--border); }
 .featured-img { position: relative; overflow: hidden; flex-shrink: 0; width: 280px; }
 .featured-card:first-child .featured-img { width: 45%; }
-.featured-img img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+.featured-img img { width: 100%; height: 100%; object-fit: cover; transition: 0.7s cubic-bezier(0.4,0,0.2,1); }
 .featured-card:hover .featured-img img { transform: scale(1.05); }
 .featured-ribbon {
-  position: absolute; top: 14px; left: 14px;
+  position: absolute; top: 16px; left: 16px;
   background: var(--earth-light); color: white; font-size: 11px;
-  font-weight: 700; padding: 4px 10px; border-radius: 50px;
+  font-weight: 700; padding: 6px 14px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.05em;
+  box-shadow: 0 4px 10px rgba(201,162,39,0.3);
 }
-.featured-info { padding: 28px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.featured-info { padding: 32px; flex: 1; display: flex; flex-direction: column; gap: 10px; background: white; }
 .featured-type {
   font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-  text-transform: uppercase; color: #a8d5a2;
+  text-transform: uppercase; color: var(--green); margin-bottom: 2px;
 }
 .featured-info h3 {
-  font-family: var(--font-display); font-size: 22px; font-weight: 700; color: white;
-  line-height: 1.3;
+  font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--dark);
+  line-height: 1.3; margin: 0;
 }
-.featured-loc { font-size: 13px; color: rgba(255,255,255,0.6); }
+.featured-loc { font-size: 14px; color: var(--mid); margin-bottom: 8px; }
 .featured-price {
   font-family: var(--font-display); font-size: 26px; font-weight: 700;
-  color: #a8d5a2; margin-top: auto;
+  color: var(--green); margin-top: auto; padding-top: 16px;
 }
 .featured-btn {
-  background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);
-  padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600;
-  font-family: var(--font-body); cursor: pointer; transition: var(--trans); width: fit-content;
+  background: white; color: var(--dark); border: 1.5px solid var(--border);
+  padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 700;
+  font-family: var(--font-body); cursor: pointer; transition: all 0.3s ease; width: fit-content;
+  margin-top: 16px;
 }
-.featured-btn:hover { background: var(--green); border-color: var(--green); }
+.featured-btn:hover { background: var(--green); border-color: var(--green); color: white; transform: translateY(-2px); box-shadow: 0 8px 16px rgba(58,125,68,0.2); }
 
 /* ===== WHY ===== */
 .why { padding: 90px 32px; max-width: 1200px; margin: 0 auto; }
@@ -828,24 +851,42 @@ export default {
 .why-card p { color: var(--light); font-size: 14px; line-height: 1.6; }
 
 /* ===== CONTACT ===== */
-.contact { padding: 90px 32px; background: var(--green-pale); }
+.contact { padding: 120px 32px; background: linear-gradient(135deg, #1b4021 0%, #3a7d44 100%); position: relative; overflow: hidden; }
+.contact::before {
+  content: ''; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%); opacity: 1; border-radius: 50%; pointer-events: none;
+}
 .contact-inner {
   max-width: 1100px; margin: 0 auto; display: grid;
-  grid-template-columns: 1fr 1fr; gap: 64px; align-items: start;
+  grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 2;
 }
-.contact-info h2 {
-  font-family: var(--font-display); font-size: 38px; font-weight: 700;
-  color: var(--dark); margin: 10px 0 16px; line-height: 1.2;
+.contact-eyebrow { color: rgba(255,255,255,0.9) !important; letter-spacing: 0.2em; font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; }
+.contact-heading {
+  font-family: 'Cormorant Garamond', serif; font-size: 46px; font-weight: 700;
+  color: white !important; margin: 0 0 20px; line-height: 1.1;
 }
-.contact-info > p { color: var(--mid); line-height: 1.7; margin-bottom: 28px; }
-.contact-details { display: flex; flex-direction: column; gap: 14px; }
+.contact-desc { color: rgba(255,255,255,0.8); font-size: 17px; line-height: 1.7; margin-bottom: 48px; max-width: 480px; }
+.contact-details { display: flex; flex-direction: column; gap: 20px; }
 .contact-item {
-  display: flex; align-items: center; gap: 12px;
-  font-size: 15px; color: var(--mid);
+  display: flex; align-items: center; gap: 20px; max-width: 400px;
+  padding: 16px 24px; border-radius: 12px; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08); transition: transform 0.3s, background 0.3s;
 }
-.contact-item span { font-size: 20px; }
+.contact-item:hover { transform: translateX(8px); background: rgba(255,255,255,0.08); }
+.contact-icon {
+  width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+.contact-text { display: flex; flex-direction: column; gap: 4px; }
+.contact-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); }
+.contact-text strong { font-size: 16px; color: white; font-weight: 500; letter-spacing: 0.02em; }
 
-.contact-form { background: white; border-radius: var(--radius); padding: 36px; box-shadow: var(--shadow); }
+.contact-form-wrapper { position: relative; }
+.contact-form {
+  background: white; border-radius: 24px; padding: 48px 40px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.4); position: relative; z-index: 2;
+}
 .form-group { margin-bottom: 20px; }
 .form-group label {
   display: block; font-size: 13px; font-weight: 600;
@@ -870,43 +911,54 @@ export default {
 .form-success { text-align: center; color: var(--green); font-weight: 600; margin-top: 14px; font-size: 14px; }
 
 /* ===== FOOTER ===== */
-.footer { background: white; border-top: 1px solid var(--border); padding: 72px 32px 0; }
+.footer { background: #1a2310; color: white; margin-top: 100px; position: relative; }
+.footer-cta-container { max-width: 1200px; margin: 0 auto; padding: 0 32px; transform: translateY(-50%); position: relative; z-index: 10; }
+.footer-cta {
+  background: #3a7d44; border-radius: 20px; padding: 48px 56px;
+  display: flex; align-items: center; justify-content: space-between; gap: 32px;
+  box-shadow: 0 20px 48px rgba(26,35,16,0.3); background-image: radial-gradient(circle at top right, #5aa05f 0%, transparent 60%);
+}
+.cta-content h2 { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 700; color: white; margin-bottom: 12px; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+.cta-content p { color: rgba(255,255,255,0.9); font-size: 16px; margin: 0; line-height: 1.6; }
+.cta-btn {
+  background: white; color: #3a7d44; border: none; padding: 18px 36px;
+  border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s; white-space: nowrap; font-family: 'DM Sans', sans-serif;
+}
+.cta-btn:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.2); }
+
 .footer-inner {
-  max-width: 1200px; margin: 0 auto;
+  max-width: 1200px; margin: 0 auto; padding: 0 32px 64px; margin-top: -30px;
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
-  padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-.footer-brand .logo-img--footer { height: 38px; filter: none; margin-bottom: 8px; }
+.footer-brand .logo-img--footer { height: 44px; filter: brightness(0) invert(1); margin-bottom: 20px; }
 .footer-brand > p {
-  color: var(--mid); font-size: 14px; line-height: 1.7;
-  margin: 16px 0 24px;
+  color: rgba(255,255,255,0.65); font-size: 15px; line-height: 1.7;
+  margin: 0 0 28px; padding-right: 40px;
 }
-.social-icons { display: flex; gap: 10px; }
+.social-icons { display: flex; gap: 12px; }
 .social-icons a {
-  width: 36px; height: 36px; border-radius: 8px;
-  background: var(--cream); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; transition: var(--trans);
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
 }
-.social-icons a:hover { background: var(--green); border-color: var(--green); }
+.social-icons a:hover { background: #3a7d44; border-color: #3a7d44; transform: translateY(-4px); }
 .social-icons svg {
-  width: 16px; height: 16px; fill: none; stroke: var(--mid);
-  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
-  transition: var(--trans);
+  width: 18px; height: 18px; fill: none; stroke: white; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.3s;
 }
-.social-icons a:hover svg { stroke: white; }
 .footer-links h4 {
-  font-size: 13px; font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--dark); margin-bottom: 20px;
+  font-size: 15px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: white; margin-bottom: 24px;
 }
-.footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
 .footer-links a {
-  font-size: 14px; color: var(--mid); text-decoration: none; transition: var(--trans);
+  font-size: 15px; color: rgba(255,255,255,0.65); text-decoration: none; transition: color 0.3s;
 }
-.footer-links a:hover { color: var(--green); padding-left: 4px; }
+.footer-links a:hover { color: white; padding-left: 6px; }
 .footer-bottom {
-  max-width: 1200px; margin: 0 auto; padding: 24px 0;
-  text-align: center; color: var(--light); font-size: 13px;
-  border-top: 1px solid var(--border);
+  max-width: 1200px; margin: 0 auto; padding: 24px 32px;
+  text-align: left; color: rgba(255,255,255,0.4); font-size: 14px;
 }
 
 /* ===== MODAL ===== */
@@ -965,7 +1017,10 @@ export default {
   .featured-card:first-child .featured-img { width: 100%; height: 200px; }
   .featured-img { width: 100%; height: 180px; }
   .footer-inner { grid-template-columns: 1fr 1fr; }
-  .contact-inner { grid-template-columns: 1fr; }
+  .footer-cta { flex-direction: column; text-align: center; padding: 40px 32px; gap: 24px; }
+  .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+  .contact-item { max-width: 100%; }
+  .contact-form { padding: 32px 24px; }
   .hero-stats { flex-wrap: wrap; }
   .stat { min-width: 50%; }
   .search-bar { flex-direction: column; border-radius: 12px; }
