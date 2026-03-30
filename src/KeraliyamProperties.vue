@@ -62,13 +62,17 @@
         <h2>What Are You Looking For?</h2>
       </div>
       <div class="cat-grid">
-        <div class="cat-card" v-for="cat in categories" :key="cat.type"
-          @click="setFilter(cat.type)" :style="{ '--accent': cat.color }">
-          <div class="cat-icon">{{ cat.icon }}</div>
-          <h3>{{ cat.title }}</h3>
-          <p>{{ cat.desc }}</p>
-          <span class="cat-count">{{ getCount(cat.type) }} listings</span>
-          <div class="cat-arrow">→</div>
+        <div class="cat-card" v-for="cat in categories" :key="cat.type" @click="setFilter(cat.type)">
+          <img :src="cat.image" class="cat-bg" alt="" />
+          <div class="cat-overlay"></div>
+          <div class="cat-content">
+            <h3>{{ cat.title }}</h3>
+            <p>{{ cat.desc }}</p>
+            <div class="cat-footer">
+              <span class="cat-count">{{ getCount(cat.type) }} listings</span>
+              <span class="cat-arrow">→</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -166,8 +170,8 @@
           <h2>Talk to Our Property Experts</h2>
           <p>Whether you're buying, selling, or renting — our team is here to guide you every step of the way.</p>
           <div class="contact-details">
-            <div class="contact-item"><span>📞</span> +91 98765 43210</div>
-            <div class="contact-item"><span>📧</span> hello@keraliyam.com</div>
+            <div class="contact-item"><span>📞</span> +91 96339 22011</div>
+            <div class="contact-item"><span>📧</span> keraliyamproperties@gmail.com</div>
             <div class="contact-item"><span>📍</span> Kochi, Kerala, India</div>
           </div>
         </div>
@@ -319,9 +323,9 @@ export default {
       ],
 
       categories: [
-        { type: 'land', title: 'Land for Sale', icon: '🌾', desc: 'Agricultural, residential, and commercial plots across Kerala.', color: '#5a8a3c' },
-        { type: 'buy', title: 'House for Sale', icon: '🏡', desc: 'Traditional Nalukettu homes, modern villas, and cozy cottages.', color: '#2e7d6e' },
-        { type: 'rent', title: 'House for Rent', icon: '🔑', desc: 'Furnished and unfurnished homes for every budget and lifestyle.', color: '#8b6914' },
+        { type: 'land', title: 'Land for Sale', desc: 'Agricultural, residential, and commercial plots across Kerala.', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800' },
+        { type: 'buy', title: 'House for Sale', desc: 'Traditional Nalukettu homes, modern villas, and cozy cottages.', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=800' },
+        { type: 'rent', title: 'House for Rent', desc: 'Furnished and unfurnished homes for every budget and lifestyle.', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800' },
       ],
 
       whyUs: [
@@ -336,8 +340,11 @@ export default {
   },
 
   computed: {
+    visibleProperties() {
+      return this.properties.filter(p => !p.is_hidden);
+    },
     filteredProperties() {
-      return this.properties.filter(p => {
+      return this.visibleProperties.filter(p => {
         const matchFilter = this.activeFilter === 'all' || p.type === this.activeFilter;
         const matchLocation = !this.searchLocation || p.location.toLowerCase().includes(this.searchLocation.toLowerCase());
         const matchType = !this.searchType || p.type === this.searchType;
@@ -345,7 +352,7 @@ export default {
       });
     },
     featuredProperties() {
-      return this.properties.filter(p => p.featured);
+      return this.visibleProperties.filter(p => p.featured);
     },
   },
 
@@ -384,7 +391,7 @@ export default {
       return { land: 'Land for Sale', buy: 'For Sale', rent: 'For Rent' }[type] || type;
     },
     getCount(type) {
-      return this.properties.filter(p => p.type === type).length;
+      return this.visibleProperties.filter(p => p.type === type).length;
     },
     openModal(p) {
       this.selectedProperty = p;
@@ -629,40 +636,45 @@ export default {
 .section-header.light .section-desc { color: rgba(255,255,255,0.65); }
 
 /* ===== CATEGORIES ===== */
-.categories {
-  padding: 80px 32px; max-width: 1200px; margin: 0 auto;
-}
-.cat-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
-}
+.categories { padding: 80px 32px; max-width: 1200px; margin: 0 auto; }
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .cat-card {
-  background: white; border-radius: var(--radius); padding: 36px 28px;
-  border: 1.5px solid var(--border); cursor: pointer;
-  transition: var(--trans); position: relative; overflow: hidden;
+  position: relative; border-radius: 16px; overflow: hidden;
+  height: 380px; cursor: pointer; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08); display: flex; align-items: flex-end;
 }
-.cat-card::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, var(--accent, var(--green)) 0%, transparent 60%);
-  opacity: 0; transition: var(--trans);
+.cat-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+.cat-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.cat-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
-.cat-card:hover::before { opacity: 0.07; }
-.cat-icon { font-size: 42px; margin-bottom: 16px; }
-.cat-card h3 {
-  font-family: var(--font-display); font-size: 22px; font-weight: 700;
-  color: var(--dark); margin-bottom: 8px;
+.cat-card:hover .cat-bg { transform: scale(1.08); }
+.cat-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(26,35,16,0.95) 0%, rgba(26,35,16,0.3) 60%, rgba(0,0,0,0) 100%);
+  transition: background 0.4s;
 }
-.cat-card p { color: var(--light); font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+.cat-card:hover .cat-overlay { background: linear-gradient(to top, rgba(26,35,16,0.98) 0%, rgba(26,35,16,0.5) 65%, rgba(0,0,0,0.1) 100%); }
+.cat-content {
+  position: relative; z-index: 2; padding: 32px 28px; width: 100%; color: white;
+}
+.cat-content h3 {
+  font-family: var(--font-display); font-size: 28px; font-weight: 700;
+  margin-bottom: 8px; color: white; line-height: 1.2;
+}
+.cat-content p {
+  font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.5; margin-bottom: 24px;
+}
+.cat-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.2); padding-top: 16px;
+}
 .cat-count {
-  font-size: 12px; font-weight: 600; color: var(--accent, var(--green));
-  background: var(--green-pale); padding: 4px 10px; border-radius: 50px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 50px; backdrop-filter: blur(4px);
 }
-.cat-arrow {
-  position: absolute; bottom: 28px; right: 28px;
-  font-size: 20px; color: var(--accent, var(--green));
-  transform: translateX(-6px); opacity: 0; transition: var(--trans);
-}
-.cat-card:hover .cat-arrow { transform: translateX(0); opacity: 1; }
+.cat-arrow { font-size: 20px; transition: transform 0.3s; }
+.cat-card:hover .cat-arrow { transform: translateX(5px); }
 
 /* ===== LISTINGS ===== */
 .listings { padding: 80px 32px; max-width: 1200px; margin: 0 auto; }

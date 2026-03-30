@@ -14,7 +14,15 @@
       <section v-if="tab === 'enquiries'">
         <div class="header-row">
           <h2>Recent Enquiries</h2>
-          <button @click="fetchEnquiries" class="refresh-btn">Refresh</button>
+          <div class="actions-group">
+            <div class="date-filters">
+              <input type="date" v-model="filterStartDate" class="search-input date-input" title="Start Date" />
+              <span class="date-sep">to</span>
+              <input type="date" v-model="filterEndDate" class="search-input date-input" title="End Date" />
+            </div>
+            <button @click="clearDateFilter" v-if="filterStartDate || filterEndDate" class="clear-btn">Clear</button>
+            <button @click="fetchEnquiries" class="refresh-btn">Refresh</button>
+          </div>
         </div>
         <div class="table-container">
           <table>
@@ -29,16 +37,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="enq in enquiries" :key="enq.id">
-                <td>{{ new Date(enq.created_at).toLocaleDateString() }}</td>
-                <td>{{ enq.name }}</td>
-                <td>{{ enq.phone }}</td>
-                <td>{{ enq.email || '-' }}</td>
-                <td>{{ enq.interest || '-' }}</td>
-                <td class="msg-col" :title="enq.message">{{ enq.message }}</td>
+              <tr v-for="enq in filteredEnquiries" :key="enq.id">
+                <td data-label="Date">{{ new Date(enq.created_at).toLocaleDateString() }}</td>
+                <td data-label="Name">{{ enq.name }}</td>
+                <td data-label="Phone">{{ enq.phone }}</td>
+                <td data-label="Email">{{ enq.email || '-' }}</td>
+                <td data-label="Interest">{{ enq.interest || '-' }}</td>
+                <td data-label="Message" class="msg-col" :title="enq.message" @click="openMessageModal(enq)">{{ enq.message }}</td>
               </tr>
-              <tr v-if="!enquiries.length">
-                <td colspan="6" class="text-center">No enquiries yet! Waiting for leads...</td>
+              <tr v-if="!filteredEnquiries.length">
+                <td colspan="6" class="text-center">No enquiries found for the selected criteria.</td>
               </tr>
             </tbody>
           </table>
@@ -63,8 +71,9 @@
               <h4>{{ p.title }}</h4>
               <p>{{ p.price }} • {{ p.type }}</p>
               <div class="card-actions">
+                <button @click="toggleVisibility(p)" class="toggle-btn">{{ p.is_hidden ? 'Show' : 'Hide' }}</button>
                 <button @click="openEditModal(p)" class="edit-btn">Edit</button>
-                <button @click="deleteProperty(p.id)" class="del-btn">Delete</button>
+                <button @click="deleteProperty(p)" class="del-btn">Delete</button>
               </div>
             </div>
           </div>
@@ -148,6 +157,26 @@
       </div>
     </div>
 
+    <!-- MESSAGE MODAL -->
+    <div v-if="showMessageModal" class="modal-overlay" @click.self="closeMessageModal">
+      <div class="modal">
+        <h3>Enquiry Details</h3>
+        <div v-if="selectedEnquiry" class="msg-details">
+          <p><strong>Date:</strong> {{ new Date(selectedEnquiry.created_at).toLocaleDateString() }}</p>
+          <p><strong>From:</strong> {{ selectedEnquiry.name }}</p>
+          <p><strong>Phone:</strong> <a :href="'tel:' + selectedEnquiry.phone" style="color: #3a7d44; font-weight: 600">{{ selectedEnquiry.phone }}</a></p>
+          <p><strong>Email:</strong> {{ selectedEnquiry.email || '-' }}</p>
+          <p><strong>Interest:</strong> {{ selectedEnquiry.interest || '-' }}</p>
+          <div class="full-message-box">
+            {{ selectedEnquiry.message }}
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" @click="closeMessageModal" class="cancel-btn">Close</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -159,10 +188,14 @@ export default {
   data() {
     return {
       searchQuery: '',
+      filterStartDate: '',
+      filterEndDate: '',
       tab: 'enquiries',
       enquiries: [],
       properties: [],
       showModal: false,
+      showMessageModal: false,
+      selectedEnquiry: null,
       isEditing: false,
       isUploading: false,
       uploadTask: '',
@@ -178,6 +211,17 @@ export default {
         String(p.id).includes(lowerQ) ||
         (p.title && p.title.toLowerCase().includes(lowerQ))
       );
+    },
+    filteredEnquiries() {
+      if (!this.filterStartDate && !this.filterEndDate) return this.enquiries;
+      
+      const start = this.filterStartDate ? new Date(this.filterStartDate).setHours(0,0,0,0) : 0;
+      const end = this.filterEndDate ? new Date(this.filterEndDate).setHours(23,59,59,999) : Infinity;
+
+      return this.enquiries.filter(enq => {
+        const enqDate = new Date(enq.created_at).getTime();
+        return enqDate >= start && enqDate <= end;
+      });
     }
   },
   async mounted() {
@@ -185,6 +229,10 @@ export default {
     await this.fetchProperties();
   },
   methods: {
+    clearDateFilter() {
+      this.filterStartDate = '';
+      this.filterEndDate = '';
+    },
     async logout() {
       await supabase.auth.signOut();
       this.$router.push('/login');
@@ -213,6 +261,23 @@ export default {
     },
     closeModal() {
       this.showModal = false;
+    },
+    openMessageModal(enq) {
+      this.selectedEnquiry = enq;
+      this.showMessageModal = true;
+    },
+    closeMessageModal() {
+      this.showMessageModal = false;
+      this.selectedEnquiry = null;
+    },
+    async toggleVisibility(p) {
+      const newHiddenState = !p.is_hidden;
+      const { error } = await supabase.from('properties').update({ is_hidden: newHiddenState }).eq('id', p.id);
+      if (error) {
+        alert("Visibility error: " + error.message);
+      } else {
+        await this.fetchProperties();
+      }
     },
     async handleFileUpload(event) {
       const file = event.target.files[0];
@@ -270,9 +335,16 @@ export default {
       await this.fetchProperties();
       this.closeModal();
     },
-    async deleteProperty(id) {
-      if (confirm('Are you certain you want to permanently delete this property?')) {
-        await supabase.from('properties').delete().eq('id', id);
+    async deleteProperty(p) {
+      if (confirm('Are you certain you want to permanently delete this property AND its image?')) {
+        if (p.image) {
+          const parts = p.image.split('/images/');
+          if (parts.length > 1) {
+            const fileName = parts[1];
+            await supabase.storage.from('images').remove([fileName]);
+          }
+        }
+        await supabase.from('properties').delete().eq('id', p.id);
         await this.fetchProperties();
       }
     }
@@ -302,7 +374,7 @@ export default {
 table { width: 100%; border-collapse: collapse; text-align: left; }
 th, td { padding: 16px 20px; border-bottom: 1px solid #eee; font-size: 15px; color: #333; }
 th { background: #f0f4ec; color: #2a5a31; font-weight: 600; }
-.msg-col { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.msg-col { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: #3a7d44; text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
 .text-center { text-align: center; color: #888; padding: 30px !important; }
 
 .property-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
@@ -313,9 +385,11 @@ th { background: #f0f4ec; color: #2a5a31; font-weight: 600; }
 .prop-id-badge { display: inline-block; background: #e0e8dc; color: #2a5a31; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
 .prop-details h4 { margin: 0 0 8px 0; font-size: 18px; color: #1a2310; }
 .prop-details p { margin: 0; color: #666; font-size: 14px; margin-bottom: 16px; }
-.card-actions { display: flex; gap: 10px; }
-.edit-btn { flex: 1; background: white; color: #3a7d44; border: 1px solid #3a7d44; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.del-btn { flex: 1; background: white; color: #d32f2f; border: 1px solid #d32f2f; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.card-actions { display: flex; gap: 8px; }
+.toggle-btn { flex: 1; background: #f0f4ec; color: #1a2310; border: 1px solid #d4e0ce; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
+.toggle-btn:hover { background: #e0e8dc; }
+.edit-btn { flex: 1; background: white; color: #3a7d44; border: 1px solid #3a7d44; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
+.del-btn { flex: 1; background: white; color: #d32f2f; border: 1px solid #d32f2f; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
 .edit-btn:hover { background: #f0f4ec; }
 .del-btn:hover { background: #fff0f0; }
 
@@ -335,4 +409,48 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #3a7d44
 .save-btn { padding: 12px 24px; background: #3a7d44; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
 .save-btn:hover:not(:disabled) { background: #2a5a31; }
 .save-btn:disabled { opacity: 0.5; background: #999; cursor: not-allowed; }
+
+.full-message-box { background: #f0f4ec; padding: 15px; border-radius: 8px; border: 1px solid #d4e0ce; margin-top: 15px; white-space: pre-wrap; font-size: 15px; color: #1a2310; line-height: 1.6; max-height: 300px; overflow-y: auto; }
+.msg-details p { margin: 8px 0; font-size: 15px; color: #444; }
+
+.date-filters { display: flex; align-items: center; gap: 10px; }
+.date-input { width: 135px; color: #333; }
+.date-sep { color: #666; font-weight: 500; font-size: 15px; }
+.clear-btn { background: #eee; color: #444; border: 1px solid #ddd; padding: 10px 15px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+.clear-btn:hover { background: #e0e0e0; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admin-nav { flex-direction: column; padding: 15px; height: auto; gap: 15px; text-align: center; }
+  .nav-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .nav-links button { height: auto; padding-bottom: 5px; margin: 0; }
+  .header-row { flex-direction: column; align-items: flex-start; gap: 15px; }
+  .actions-group { width: 100%; flex-direction: column; align-items: stretch; }
+  .search-input { width: 100%; box-sizing: border-box; }
+  .date-filters { flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 5px; }
+  .date-input { flex: 1; min-width: 120px; }
+  .clear-btn, .refresh-btn { width: 100%; }
+  
+  /* Table to Cards */
+  .table-container { background: transparent; box-shadow: none; border-radius: 0; padding: 0; }
+  table, thead, tbody, th, td, tr { display: block; }
+  thead tr { display: none; }
+  tr { border: 1px solid #eee; border-radius: 12px; margin-bottom: 15px; padding: 5px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+  td { border: none; position: relative; padding: 12px 10px 12px 40%; text-align: left; border-bottom: 1px dashed #eee; font-size: 14px; }
+  td:last-child { border-bottom: none; }
+  td::before { 
+    content: attr(data-label); 
+    position: absolute; 
+    left: 15px; 
+    top: 12px;
+    width: 35%; 
+    font-weight: 600; 
+    color: #2a5a31; 
+    white-space: nowrap;
+  }
+  .msg-col { max-width: none; white-space: normal; }
+  
+  .property-grid { grid-template-columns: 1fr; }
+  .modal { padding: 20px; }
+}
 </style>
