@@ -13,18 +13,51 @@
         <button class="hamburger" @click="menuOpen = !menuOpen" :class="{ active: menuOpen }">
           <span></span><span></span><span></span>
         </button>
-        <ul class="nav-links" :class="{ open: menuOpen }">
+        <ul class="nav-links">
           <li><a href="#home" @click="scrollTo('home')">Home</a></li>
           <li><a href="#listings" @click="setFilter('land')">Buy Land</a></li>
           <li><a href="#listings" @click="setFilter('buy')">Buy House</a></li>
           <li><a href="#listings" @click="setFilter('rent')">Rent House</a></li>
           <li><a href="#contact" @click="scrollTo('contact')">Contact</a></li>
         </ul>
+
+        <!-- Mobile Drawer -->
+        <transition name="drawer">
+          <div class="mobile-drawer" v-if="menuOpen">
+            <div class="drawer-header">
+              <div class="logo">
+                <span class="logo-leaf">🌿</span>
+                <div class="logo-text">
+                  <span class="drawer-logo-main">Keraliyam</span>
+                  <span class="drawer-logo-sub">Properties</span>
+                </div>
+              </div>
+              <button class="drawer-close" @click="menuOpen = false">✕</button>
+            </div>
+            <nav class="drawer-nav">
+              <a href="#home" @click="scrollTo('home')">Home</a>
+              <a href="#listings" @click="setFilter('land')">Buy Land</a>
+              <a href="#listings" @click="setFilter('buy')">Buy House</a>
+              <a href="#listings" @click="setFilter('rent')">Rent House</a>
+              <a href="#contact" @click="scrollTo('contact')">Contact</a>
+            </nav>
+            <div class="drawer-footer">
+              <p>📞 +91 96339 22011</p>
+              <p>📧 keraliyamproperties@gmail.com</p>
+            </div>
+          </div>
+        </transition>
+        <transition name="fade-overlay">
+          <div class="drawer-overlay" v-if="menuOpen" @click="menuOpen = false"></div>
+        </transition>
       </div>
     </nav>
 
     <!-- ====== HERO ====== -->
     <section id="home" class="hero">
+      <video class="hero-video" autoplay loop muted playsinline>
+        <source src="/my_kerala_video.mp4" type="video/mp4" />
+      </video>
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <p class="hero-tagline">Kerala's Trusted Property Partner</p>
@@ -581,16 +614,23 @@ export default {
 /* ===== HERO ===== */
 .hero {
   min-height: 100vh;
-  background: url('/kerala_hero.png') center/cover no-repeat;
   position: relative; display: flex; flex-direction: column;
   justify-content: center; align-items: center; text-align: center;
   padding: 120px 24px 80px;
+  overflow: hidden;
+  background-color: var(--dark);
+}
+.hero-video {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  z-index: 0;
+  transform: scale(1.08); /* Scales the video up 8% to push watermarks out of the frame */
 }
 .hero-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(160deg, rgba(26,35,16,0.75) 0%, rgba(40,80,30,0.55) 60%, rgba(0,0,0,0.4) 100%);
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(160deg, rgba(26,35,16,0.8) 0%, rgba(40,80,30,0.65) 60%, rgba(0,0,0,0.5) 100%);
 }
-.hero-content { position: relative; max-width: 800px; }
+.hero-content { position: relative; max-width: 800px; z-index: 2; }
 .hero-tagline {
   display: inline-block; padding: 6px 16px; border-radius: 50px;
   background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
@@ -633,7 +673,7 @@ export default {
 .search-btn:hover { background: var(--green-light); }
 
 .hero-stats {
-  position: relative; display: flex; gap: 0;
+  position: relative; display: flex; gap: 0; z-index: 2;
   background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.2); border-radius: 12px;
   margin-top: 60px; overflow: hidden;
@@ -1000,16 +1040,98 @@ export default {
 .fade-enter-active, .fade-leave-active { transition: opacity 0.25s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
+/* ===== MOBILE DRAWER ===== */
+.mobile-drawer {
+  display: none;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .hamburger { display: flex; }
-  .nav-links {
-    display: none; position: absolute; top: 100%; left: 0; right: 0;
-    background: white; flex-direction: column; padding: 12px;
-    box-shadow: var(--shadow-lg); gap: 2px; border-top: 1px solid var(--border);
+  .nav-links { display: none; }
+
+  .mobile-drawer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; right: 0;
+    width: 80%; max-width: 320px;
+    height: 100vh;
+    background: #fff;
+    z-index: 9999;
+    box-shadow: -8px 0 40px rgba(26,35,16,0.18);
+    padding: 0;
+    overflow-y: auto;
   }
-  .nav-links.open { display: flex; }
-  .nav-links a { color: var(--mid) !important; }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--dark);
+  }
+  .drawer-logo-main {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 700;
+    color: #fff; display: block; line-height: 1.1;
+  }
+  .drawer-logo-sub {
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); display: block;
+  }
+  .drawer-close {
+    background: rgba(255,255,255,0.12);
+    border: none; color: #fff;
+    width: 36px; height: 36px;
+    border-radius: 50%; font-size: 16px;
+    cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    transition: var(--trans);
+    flex-shrink: 0;
+  }
+  .drawer-close:hover { background: rgba(255,255,255,0.25); }
+
+  .drawer-nav {
+    display: flex; flex-direction: column;
+    padding: 16px 0; flex: 1;
+  }
+  .drawer-nav a {
+    display: flex; align-items: center;
+    padding: 16px 24px;
+    font-size: 16px; font-weight: 500;
+    color: var(--dark); text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    transition: var(--trans);
+    gap: 12px;
+  }
+  .drawer-nav a:last-child { border-bottom: none; }
+  .drawer-nav a:hover, .drawer-nav a:active {
+    background: var(--green-pale);
+    color: var(--green);
+    padding-left: 32px;
+  }
+
+  .drawer-footer {
+    padding: 20px 24px;
+    background: var(--green-pale);
+    border-top: 1px solid var(--border);
+  }
+  .drawer-footer p {
+    font-size: 13px; color: var(--mid);
+    margin-bottom: 6px; line-height: 1.5;
+  }
+  .drawer-footer p:last-child { margin-bottom: 0; }
+
+  .drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,35,16,0.55);
+    z-index: 9998;
+    backdrop-filter: blur(2px);
+  }
+
   .cat-grid, .why-grid { grid-template-columns: 1fr 1fr; }
   .listings-grid { grid-template-columns: 1fr 1fr; }
   .featured-grid { grid-template-columns: 1fr; }
@@ -1038,4 +1160,16 @@ export default {
   .contact { padding: 60px 20px; }
   .footer { padding: 48px 20px 0; }
 }
+
+/* Drawer slide-in animation */
+.drawer-enter-active { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.drawer-leave-active { transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+.drawer-enter-from, .drawer-leave-to { transform: translateX(100%); }
+.drawer-enter-to, .drawer-leave-from { transform: translateX(0); }
+
+/* Overlay fade animation */
+.fade-overlay-enter-active { transition: opacity 0.3s; }
+.fade-overlay-leave-active { transition: opacity 0.25s; }
+.fade-overlay-enter-from, .fade-overlay-leave-to { opacity: 0; }
+.fade-overlay-enter-to, .fade-overlay-leave-from { opacity: 1; }
 </style>
